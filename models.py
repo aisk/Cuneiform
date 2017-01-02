@@ -69,7 +69,7 @@ class Tag(Object):
     def get_by_name(cls, name):
         reg = '^' + name + '$'
         try:
-            return self.query.matched('name', reg).first()
+            return cls.query.matched('name', reg).first()
         except LeanCloudError as e:
             if e.code == 101:
                 return None
@@ -96,7 +96,7 @@ class TagPostMap(Object):
 
     @classmethod
     def get_tags_by_post(cls, post):
-        tags = [x.tag for x in self.query.equal_to('post', post).include('tag').find()]
+        tags = [x.tag for x in cls.query.equal_to('post', post).include('tag').find()]
         if len(tags) == 0:
             return None
         return tags
