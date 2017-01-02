@@ -20,12 +20,16 @@ from leancloud import LeanCloudError
 from models import (Post, Tag, TagPostMap, Attachment, User, Page)
 from utils import parse_tag_names
 from utils import allowed_file
+from views.admin import admin_view
 
 
 app = Flask(__name__)
 
 # Required for LeanEngine
 engine = Engine(app)
+
+
+app.register_blueprint(admin_view, url_prefix='/admin')
 
 
 @app.route('/')
@@ -42,7 +46,7 @@ def index(post_per_page=10):
             posts, more = None, False
         else:
             raise e
-    return render_template('index.html', posts=posts, next=next, page=current_page)
+    return render_template('post_list.html', posts=posts, next=next, page=current_page)
 
 
 @app.route('/post/new')
@@ -112,7 +116,7 @@ def show_post(post_id):
         else:
             raise e
     tags = TagPostMap.get_tags_by_post(post)
-    return render_template('single-post.html', post=post, tags=tags)
+    return render_template('post.html', post=post, tags=tags)
 
 
 @app.route('/tag/<tag_name>')
@@ -130,7 +134,7 @@ def tag_index(tag_name, post_per_page=10):
             tag, posts, more = None, None, False
         else:
             raise e
-    return render_template('index.html', tag=tag, posts=posts, next=next, page=current_page)
+    return render_template('post_list.html', tag=tag, posts=posts, next=next, page=current_page)
 
 
 @app.route('/user/login')
