@@ -16,23 +16,18 @@ admin_view = Blueprint('admin', __name__, template_folder='template')
 
 
 @admin_view.route('')
-@admin_view.route('/dashboard')
-def dashboard():
-    return render_template('admin/dashboard.html')
-
-
 @admin_view.route('/post_list')
-def library():
-    return render_template('admin/post_list.html')
+def post_list():
+    return render_template('admin/post_list.html', active="post_list")
 
 
 @admin_view.route('/post')
-def editor():
-    return render_template('admin/post.html')
+def post():
+    return render_template('admin/post.html', active="post_list")
 
 
 @admin_view.route('/post', methods=['POST'])
-def submit_post(post=None):
+def post_submit(post=None):
     if not post:
         return "creating new post"
     elif post and isinstance(post, Post):
@@ -42,17 +37,17 @@ def submit_post(post=None):
 
 
 @admin_view.route('/image_list')
-def images():
-    return render_template('admin/image_list.html')
+def image_list():
+    return render_template('admin/image_list.html', active="image_list")
 
 
 @admin_view.route('/image')
-def image_uploader():
-    return render_template('admin/image.html')
+def image():
+    return render_template('admin/image.html', active="image_list")
 
 
 @admin_view.route('/image', methods=['POST'])
-def submit_image(attachment=None):
+def image_submit(attachment=None):
     if not attachment:
         return "uploading new image"
     elif attachment and isinstance(attachment, Attachment):
@@ -62,17 +57,17 @@ def submit_image(attachment=None):
 
 
 @admin_view.route('/tag_list')
-def tags():
-    return render_template('admin/tag_list.html')
+def tag_list():
+    return render_template('admin/tag_list.html', active="tag_list")
 
 
 @admin_view.route('/tag')
 def tag():
-    return render_template('admin/tag.html')
+    return render_template('admin/tag.html', active="tag_list")
 
 
 @admin_view.route('/tag', methods=['POST'])
-def submit_tag(tag=None):
+def tag_submit(tag=None):
     if not tag:
         return "creating new tag"
     elif tag and isinstance(tag, Tag):
