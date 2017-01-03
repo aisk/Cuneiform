@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css')}}">
-    <script src="{{ url_for('static', filename='jquery.slim.min.js') }}" ></script>
-    <script src="{{ url_for('static', filename='bootstrap.min.js') }}" ></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery.slim.min.js') }}" ></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" ></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
   <body>
@@ -16,9 +17,9 @@
     <div class="row">
       <section class="col-md-2">
         <ul class="nav nav-pills nav-stacked">
-          <li class="{% if active == 'post_list' %}active{% endif %}"><a href="{{ url_for('admin.post_list') }}">Posts</a></li>
-          <li class="{% if active == 'tag_list' %}active{% endif %}"><a href="{{ url_for('admin.tag_list') }}">Tags</a></li>
-          <li class="{% if active == 'image_list' %}active{% endif %}"><a href="{{ url_for('admin.image_list') }}">Images</a></li>
+          <li {% if active == 'post_list' %}class="active"{% endif %}><a href="{{ url_for('admin.post_list') }}">Posts</a></li>
+          <li {% if active == 'tag_list' %}class="active"{% endif %}><a href="{{ url_for('admin.tag_list') }}">Tags</a></li>
+          <li {% if active == 'image_list' %}class="active"{% endif %}><a href="{{ url_for('admin.image_list') }}">Images</a></li>
         </ul>
       </section>
       <section class="col-md-10">
