@@ -1,5 +1,23 @@
 {% extends "admin/layout/main.html" %}
 {% block title %}Posts - Cuneiform{% endblock %}
 {% block content %}
-This is the post_list.
+<table class="table table-hover">
+  <thead>
+    <th>#</th><th>Post Title</th><th>Time Created</th><th>Time Updated</th><th>Actions</th>
+  </thead>
+  <tbody>
+    {% for post in posts %}
+    <tr>
+      <td></td>
+      <td>{{ post.title }}</td>
+      <td>{{ post.createdAt }}</td>
+      <td>{{ post.updatedAt }}</td>
+      <td>
+        <a class="btn btn-default btn-xs"href="#">edit</a>
+        <a class="btn btn-danger btn-xs"href="#">trash</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

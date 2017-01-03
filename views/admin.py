@@ -18,7 +18,24 @@ admin_view = Blueprint('admin', __name__, template_folder='template')
 @admin_view.route('')
 @admin_view.route('/post_list')
 def post_list():
-    return render_template('admin/post_list.html', active="post_list")
+    posts = [
+        {
+            'title': 'Lorem Ipsum',
+            'createdAt': '2016-12-31',
+            'updatedAt': '2017-1-1'
+        },
+        {
+            'title': 'Lorem Ipsum',
+            'createdAt': '2016-12-31',
+            'updatedAt': '2017-1-1'
+        },
+        {
+            'title': 'Lorem Ipsum',
+            'createdAt': '2016-12-31',
+            'updatedAt': '2017-1-1'
+        }
+    ]
+    return render_template('admin/post_list.html', active="post_list", posts=posts)
 
 
 @admin_view.route('/post')
