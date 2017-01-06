@@ -51,46 +51,30 @@ class Attachment(File):
     pass
 
 
-class TagPage(Query):
-
-    def __init__(self, post_per_page, current_page, tag=None):
-        super(TagPage, self).__init__(TagPostMap)
-        if not tag:
-            raise TypeError('No tag found')
-        if not isinstance(tag, Tag):
-            raise TypeError('Tag should be instance of Tag')
-        self._tag = tag
-        self._post_per_page = post_per_page
-        self._current_page = current_page
-
-    def posts(self):
-        self.has_next = False
-        self.add_descending('createdAt')
-        self.equal_to('tag', self._tag)
-        self.include('post')
-        self.limit(self._post_per_page + 1)
-        self.skip((self._current_page - 1) * self._post_per_page)
-        items = [x.get('post') for x in self.find()]
-        if len(items) - self._post_per_page == 1:
-            self.has_next = True
-            items = items[:-1]
-        return items
+def get_posts(post_per_page, current_page):
+    has_more = False
+    query = Query(Post)
+    query.add_descending('createdAt')
+    query.include('author')
+    query.limit(post_per_page + 1)
+    query.skip((current_page - 1) * post_per_page)
+    items = query.find()
+    if len(items) - post_per_page == 1:
+        has_more = True
+        items = items[:-1]
+    return dict(items=items, has_more=has_more)
 
 
-class PostPage(Query):
-
-    def __init__(self, post_per_page, current_page):
-        super(PostPage, self).__init__(Post)
-        self._post_per_page = post_per_page
-        self._current_page = current_page
-
-    def posts(self):
-        self.has_next = False
-        self.add_descending('createdAt')
-        self.limit(self._post_per_page + 1)
-        self.skip((self._current_page - 1) * self._post_per_page)
-        items = self.find()
-        if len(items) - self._post_per_page == 1:
-            self.has_next = True
-            items = items[:-1]
-        return items
+def get_posts_by_tag(post_per_page, current_page, tag=None):
+    has_more = False
+    query = Query(TagPostMap)
+    query.add_descending('createdAt')
+    query.equal_to('tag', tag)
+    query.include('post')
+    query.limit(post_per_page + 1)
+    query.skip((current_page - 1) * post_per_page)
+    items = [x.get('post') for x in query.find()]
+    if len(items) - post_per_page == 1:
+        has_more = True
+        items = items[:-1]
+    return dict(items=items, has_more=has_more)
