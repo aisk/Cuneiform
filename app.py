@@ -7,17 +7,20 @@ from flask import redirect
 from flask import url_for
 from flask import flash
 from flask import abort
-
 from markdown import markdown
 
-# Required for LeanEngine
 from leancloud import Engine
 from leancloud import LeanEngineError
-
 from leancloud import ACL
 from leancloud import LeanCloudError
 
-from models import (Post, Tag, TagPostMap, Attachment, User, Page)
+from models import Post
+from models import Tag
+from models import TagPostMap
+from models import Attachment
+from models import User
+from models import PostPage
+from models import TagPage
 from utils import parse_tag_names
 from utils import allowed_file
 from views.admin import admin_view
@@ -38,7 +41,7 @@ def index(post_per_page=10):
     if 'page' in request.args.keys():
         current_page = int(request.args.get('page'))
     try:
-        page = Page(post_per_page, current_page)
+        page = PostPage(post_per_page, current_page)
         posts = page.posts()
         next = page.has_next
     except LeanCloudError as e:
@@ -75,12 +78,14 @@ def new_post():
         return redirect(url_for('post_form'))
 
     post = Post()
-    post.title = title
-    post.content = content
-    post.marked_content = markdown(content)
-    post.author = author
+    post.set({
+        'title': title,
+        'content': content,
+        'marked_content': markdown(content),
+        'author': author
+    })
     if featured_image:
-        post.featured_image = featured_image
+        post.set('featured_image', featured_image)
 
     acl = ACL()
     acl.set_public_read_access(True)
@@ -126,7 +131,7 @@ def tag_index(tag_name, post_per_page=10):
         current_page = int(request.args.get('page'))
     try:
         tag = Tag.get_by_name(tag_name)
-        page = Page(post_per_page, current_page, tag)
+        page = TagPage(post_per_page, current_page, tag)
         posts = page.posts()
         next = page.has_next
     except LeanCloudError as e:

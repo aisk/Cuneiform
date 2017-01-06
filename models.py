@@ -8,58 +8,12 @@ from datetime import datetime
 
 class Post(Object):
 
-    @property
-    def title(self):
-        return self.get('title')
-
-    @title.setter
-    def title(self, title):
-        self.set('title', title)
-
-    @property
-    def content(self):
-        return self.get('content')
-
-    @content.setter
-    def content(self, content):
-        self.set('content', content)
-
-    @property
-    def marked_content(self):
-        return self.get('marked_content')
-
-    @marked_content.setter
-    def marked_content(self, marked_content):
-        self.set('marked_content', marked_content)
-
-    @property
-    def featured_image(self):
-        return self.get('featured_image')
-
-    @featured_image.setter
-    def featured_image(self, featured_image):
-        self.set('featured_image', featured_image)
-
-    @property
-    def author(self):
-        return self.get('author')
-
-    @author.setter
-    def author(self, author):
-        self.set('author', author)
+    pass
 
 
 class Tag(Object):
-    @property
-    def name(self):
-        return self.get('name')
 
-    @name.setter
-    def name(self, name):
-        self.set('name', name)
-
-    @property
-    def post_count(self):
+    def get_post_count(self):
         if self.get('post_count'):
             return self.get('post_count')
         else:
@@ -78,66 +32,65 @@ class Tag(Object):
 
 
 class TagPostMap(Object):
-    @property
-    def tag(self):
-        return self.get('tag')
-
-    @tag.setter
-    def tag(self, tag):
-        self.set('tag', tag)
-
-    @property
-    def post(self):
-        return self.get('post')
-
-    @post.setter
-    def post(self, post):
-        self.set('post', post)
 
     @classmethod
     def get_tags_by_post(cls, post):
-        tags = [x.tag for x in cls.query.equal_to('post', post).include('tag').find()]
+        tags = [x.get('tag') for x in cls.query.equal_to('post', post).include('tag').find()]
         if len(tags) == 0:
             return None
         return tags
 
 
 class User(Object):
+
     pass
 
 
 class Attachment(File):
+
     pass
 
 
-class Page(Query):
+class TagPage(Query):
+
     def __init__(self, post_per_page, current_page, tag=None):
+        super(TagPage, self).__init__(TagPostMap)
+        if not tag:
+            raise TypeError('No tag found')
+        if not isinstance(tag, Tag):
+            raise TypeError('Tag should be instance of Tag')
+        self._tag = tag
         self._post_per_page = post_per_page
         self._current_page = current_page
-        if tag is None:
-            Query.__init__(self, Post)
-            self.limit(post_per_page + 1)
-            self.add_descending('createdAt')
-            self._is_tag_index = False
-        elif isinstance(tag, Tag):
-            Query.__init__(self, TagPostMap)
-            self.limit(post_per_page + 1)
-            self.add_descending('createdAt')
-            self.equal_to('tag', tag)
-            self.include('post')
-            self._is_tag_index = True
-        else:
-            raise TypeError('tag should be `None` or instance of `Tag`')
 
     def posts(self):
         self.has_next = False
-        if self._current_page > 1:
-            self.skip((self._current_page - 1) * self._post_per_page)
-        if self._is_tag_index:
-            items = [x.post for x in self.find()]
-        else:
-            items = self.find()
+        self.add_descending('createdAt')
+        self.equal_to('tag', self._tag)
+        self.include('post')
+        self.limit(self._post_per_page + 1)
+        self.skip((self._current_page - 1) * self._post_per_page)
+        items = [x.get('post') for x in self.find()]
         if len(items) - self._post_per_page == 1:
             self.has_next = True
-            return items[:-1]
+            items = items[:-1]
+        return items
+
+
+class PostPage(Query):
+
+    def __init__(self, post_per_page, current_page):
+        super(PostPage, self).__init__(Post)
+        self._post_per_page = post_per_page
+        self._current_page = current_page
+
+    def posts(self):
+        self.has_next = False
+        self.add_descending('createdAt')
+        self.limit(self._post_per_page + 1)
+        self.skip((self._current_page - 1) * self._post_per_page)
+        items = self.find()
+        if len(items) - self._post_per_page == 1:
+            self.has_next = True
+            items = items[:-1]
         return items
