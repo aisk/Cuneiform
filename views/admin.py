@@ -11,6 +11,8 @@ from models import Tag
 from models import TagPostMap
 from models import Attachment
 from models import User
+from models import get_posts
+from models import get_posts_by_tag
 
 admin_view = Blueprint('admin', __name__, template_folder='template')
 
@@ -18,23 +20,9 @@ admin_view = Blueprint('admin', __name__, template_folder='template')
 @admin_view.route('')
 @admin_view.route('/post_list')
 def post_list():
-    posts = [
-        {
-            'title': 'Lorem Ipsum',
-            'createdAt': '2016-12-31',
-            'updatedAt': '2017-1-1'
-        },
-        {
-            'title': 'Lorem Ipsum',
-            'createdAt': '2016-12-31',
-            'updatedAt': '2017-1-1'
-        },
-        {
-            'title': 'Lorem Ipsum',
-            'createdAt': '2016-12-31',
-            'updatedAt': '2017-1-1'
-        }
-    ]
+    page = get_posts(10, 1)
+    posts = page['items']
+    has_more = page['has_more']
     return render_template('admin/post_list.html', active="post_list", posts=posts)
 
 

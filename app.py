@@ -19,8 +19,8 @@ from models import Tag
 from models import TagPostMap
 from models import Attachment
 from models import User
-from models import PostPage
-from models import TagPage
+from models import get_posts
+from models import get_posts_by_tag
 from utils import parse_tag_names
 from utils import allowed_file
 from views.admin import admin_view
@@ -41,9 +41,9 @@ def index(post_per_page=10):
     if 'page' in request.args.keys():
         current_page = int(request.args.get('page'))
     try:
-        page = PostPage(post_per_page, current_page)
-        posts = page.posts()
-        next = page.has_next
+        page = get_posts(post_per_page, current_page)
+        posts = page['items']
+        next = page['has_more']
     except LeanCloudError as e:
         if e.code == 101:
             posts, more = None, False
@@ -131,9 +131,9 @@ def tag_index(tag_name, post_per_page=10):
         current_page = int(request.args.get('page'))
     try:
         tag = Tag.get_by_name(tag_name)
-        page = TagPage(post_per_page, current_page, tag)
-        posts = page.posts()
-        next = page.has_next
+        page = get_posts_by_tag(post_per_page, current_page, tag)
+        posts = page['items']
+        next = page['has_more']
     except LeanCloudError as e:
         if e.code == 101:
             tag, posts, more = None, None, False
@@ -149,7 +149,8 @@ def login_form():
 
 @app.route('/user/login', methods=['POST'])
 def login():
-    username, password = request.form['username'], request.form['password']
+    username = request.form['username']
+    password = request.form['password']
     user = User()
     user.login(username, password)
     if 'next' in request.args.keys():
